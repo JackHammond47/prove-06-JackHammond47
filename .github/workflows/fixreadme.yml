@@ -1,0 +1,26 @@
+name: <(^v^)> Update readme.md with description
+
+on:
+  push:
+    branches:
+      - main
+      - stable
+  pull_request:
+    types: [ open, synchronize ]
+
+jobs:
+  readme-update:
+    name: Update readme to latest version
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v2
+      - run: curl --url https://raw.githubusercontent.com/byui-cse/cse212-csharp/main/docs/lesson06/prove.md | sed -e '1,5d' | sed 's#^.*include image.html url=\"\([^\"]*\)".*$#![\1](https://byui-cse.github.io/cse212-csharp/lesson06/\1)#g' | sed 's#prove-[0-9][0-9]-\[username]#\${{github.event.repository.name}}#g' > readme.md
+      - name: push
+        uses: EndBug/add-and-commit@v9
+        with:
+          cwd: './'
+          add: 'readme.md --force'
+          message: 'Updated README with latest changes'
